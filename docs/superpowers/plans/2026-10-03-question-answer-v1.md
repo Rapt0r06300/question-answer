@@ -40,6 +40,7 @@
 
 **Files:**
 - Create: `package.json`
+- Create: `package-lock.json`
 - Create: `eslint.config.js`
 - Create: `.prettierrc.json`
 - Create: `.gitignore`
@@ -52,16 +53,20 @@
 - Consumes: none.
 - Produces: `npm run build`, `npm test`, `npm run lint`, `npm run format:check`, and `dist/question-answer.user.js`.
 
-- [ ] **Step 1: Write the failing build smoke test**
+- [ ] **Step 1: Add the minimal test/build scaffold**
 
-Create `tests/smoke/build.test.js` asserting that the build script produces `dist/question-answer.user.js` containing the userscript metadata keys `@name Question Answer`, `@version`, `@grant GM.getValue`, `@grant GM.setValue`, and `@inject-into content`.
+Create `package.json` with Node 22-compatible dev dependencies for Vitest, jsdom, esbuild, ESLint, and Prettier; run `npm install` to generate `package-lock.json`. This scaffold contains no product behavior.
 
-- [ ] **Step 2: Run the smoke test and verify failure**
+- [ ] **Step 2: Write the failing build smoke test**
+
+Create `tests/smoke/build.test.js` asserting that the build script produces `dist/question-answer.user.js` containing the userscript metadata keys `@name Question Answer`, `@version`, `@grant GM.getValue`, `@grant GM.setValue`, `@inject-into content`, and the broad HTTPS match needed for downstream provider discovery.
+
+- [ ] **Step 3: Run the smoke test and verify failure**
 
 Run: `npm test -- tests/smoke/build.test.js`  
-Expected: FAIL because package/build files do not yet exist.
+Expected: FAIL because the build script/product entrypoint does not yet exist.
 
-- [ ] **Step 3: Add the minimal Node/esbuild project foundation**
+- [ ] **Step 4: Add the minimal Node/esbuild project foundation**
 
 Use Node.js 22. Add exact scripts:
 
@@ -78,19 +83,19 @@ Use Node.js 22. Add exact scripts:
 
 The build script bundles `src/main.js` as one browser IIFE and prepends a deterministic metadata block. Do not add runtime dependencies unless required by a later task.
 
-- [ ] **Step 4: Run the smoke test and full quality gate**
+- [ ] **Step 5: Run the smoke test and full quality gate**
 
-Run: `npm install && npm run check`  
+Run: `npm run check`  
 Expected: PASS and `dist/question-answer.user.js` exists.
 
-- [ ] **Step 5: Add CI**
+- [ ] **Step 6: Add CI**
 
 Create `.github/workflows/ci.yml` on pushes/PRs to `main`, using Node 22, `npm ci`, and `npm run check`. CI must not contain credentials or navigation to ZBD/PrimeEarn.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add package.json eslint.config.js .prettierrc.json .gitignore scripts src tests .github/workflows/ci.yml dist/question-answer.user.js
+git add package.json package-lock.json eslint.config.js .prettierrc.json .gitignore scripts src tests .github/workflows/ci.yml dist/question-answer.user.js
 git commit -m "build: add userscript project foundation"
 ```
 
@@ -174,7 +179,9 @@ Assert:
 - `monetize.primeearn.com` is approved by the shipped default policy;
 - unknown hosts are denied;
 - wildcard-like string tricks do not accidentally approve sibling/attacker domains;
-- on an unapproved host, `detectProvider` returns `{ kind: "unapproved-host", hostname }` without calling the generic DOM scanner.
+- an unapproved host inside the short-lived discovery window may show only the assistant-owned approval control and must not call the generic DOM scanner;
+- an unapproved host outside the discovery window exits silently without overlay or DOM scan;
+- approving a host stores exactly that normalized hostname, never a suffix wildcard.
 
 - [ ] **Step 2: Run and verify failure**
 
@@ -183,9 +190,15 @@ Expected: FAIL.
 
 - [ ] **Step 3: Implement domain policy and adapter interface**
 
-Default approved host set contains only explicit PrimeEarn hosts required by V1. User-approved downstream hosts are stored locally.
+The userscript metadata uses a broad HTTPS match so it can continue after PrimeEarn redirects to previously unseen providers, but the runtime performs an allowlist check before reading page content. Default approved hosts contain only explicit PrimeEarn hosts required by V1. User-approved downstream hosts are stored locally.
 
-- [ ] **Step 4: Write PrimeEarn/generic detection tests**
+To avoid prompting on unrelated browsing, maintain `settings.providerDiscoveryUntil`. Visiting an approved PrimeEarn page may arm a short-lived discovery window (default 10 minutes). On an unapproved hostname during that window, Question Answer may read only `location.hostname` and render its own minimal “Approve this survey host?” control without inspecting the page DOM. Outside the window it exits silently.
+
+- [ ] **Step 4: Implement short-lived downstream-provider discovery**
+
+Add `armProviderDiscovery(settings, now, ttlMs = 600000) -> Settings` and `canOfferHostApproval(settings, now) -> boolean`. This mechanism may use GM state and `location.hostname` only; it must not inspect the unapproved page DOM.
+
+- [ ] **Step 5: Write PrimeEarn/generic detection tests**
 
 Fixtures cover:
 - PrimeEarn hostname recognition;
@@ -194,11 +207,11 @@ Fixtures cover:
 - unapproved host never falling back to `generic`;
 - capability objects never claim unsupported features.
 
-- [ ] **Step 5: Implement detector and adapters**
+- [ ] **Step 6: Implement detector and adapters**
 
 Keep PrimeEarn-specific selectors/text signatures inside `src/providers/primeearn.js`; shared form discovery remains outside adapters.
 
-- [ ] **Step 6: Run tests**
+- [ ] **Step 7: Run tests**
 
 Run: `npm test -- tests/core/domain-policy.test.js tests/providers/detection.test.js`  
 Expected: PASS.
@@ -364,7 +377,7 @@ Expected: FAIL.
 
 - [ ] **Step 3: Implement the base overlay**
 
-Use `textContent` and DOM APIs for dynamic strings. Keep controls usable at iPhone viewport widths.
+Use `textContent` and DOM APIs for dynamic strings. Keep controls usable at iPhone viewport widths. Add a separate minimal host-approval prompt that can render without reading any unapproved page DOM and is shown only during the provider-discovery window.
 
 - [ ] **Step 4: Write unknown/sensitive question tests**
 
@@ -629,7 +642,8 @@ Assert docs mention:
 - manual CAPTCHA/verification pause;
 - how to add/approve a downstream provider host;
 - local-only profile/history;
-- how to clear/export local data;
+- how to clear local data;
+- that encrypted export/import is a post-V1 extension unless it has been implemented and tested;
 - raw-GitHub installer fallback if Pages is unavailable.
 
 - [ ] **Step 2: Run and verify failure**
