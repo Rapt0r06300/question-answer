@@ -15,9 +15,10 @@ for (const group of GROUPS) for (const alias of group.aliases) INDEX.set(normali
 
 export function matchAlias(questionText) {
   const normalized = normalizeQuestion(questionText);
-  const key = INDEX.get(normalized.text);
-  if (!key) return null;
-  return { key, confidence: 1, scope: normalized.scope };
+  let key = INDEX.get(normalized.text);
+  let confidence = 1;
+  if (!key) { const matches = new Set(); for (const [alias, candidate] of INDEX) if (alias.length >= 8 && (normalized.text.includes(alias) || alias.includes(normalized.text))) matches.add(candidate); if (matches.size !== 1) return null; [key] = matches; confidence = 0.97; }
+  return { key, confidence, scope: normalized.scope };
 }
 
 export const PROFILE_ALIAS_GROUPS = Object.freeze(GROUPS.map((group) => Object.freeze({ ...group, aliases: Object.freeze([...group.aliases]) })));
