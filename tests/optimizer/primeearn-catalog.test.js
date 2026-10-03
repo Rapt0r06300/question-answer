@@ -1,0 +1,4 @@
+import test from'node:test';import assert from'node:assert/strict';import{discoverPrimeEarnSurveys,launchPrimeEarnSurvey}from'../../src/optimizer/primeearn-catalog.js';
+function card(text,href){const link={href,getAttribute:k=>k==='href'?href:null,matches:()=>true,closest:()=>cardEl,scrollIntoView(){},click(){this.clicked=true}};const cardEl={innerText:text,querySelector:()=>link};link.closest=()=>cardEl;return link}
+test('ranks visible PrimeEarn cards by sats per minute',()=>{const slow=card('16 min 1084 Sats 2 (33)','https://survey/a'),fast=card('7 min 512 Sats 2.5 (20)','https://survey/b');const doc={querySelectorAll:()=>[slow,fast]};const x=discoverPrimeEarnSurveys(doc);assert.equal(x.length,2);assert.equal(x[0].rewardSats,512);assert.ok(x[0].satsPerMinute>x[1].satsPerMinute)});
+test('launches the selected visible card',()=>{const el=card('7 min 512 Sats','https://survey/b');assert.equal(launchPrimeEarnSurvey({element:el}),true);assert.equal(el.clicked,true)});
