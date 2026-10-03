@@ -1,0 +1,1 @@
+export function createCancelableScheduler(){let generation=0;const timers=new Set();return{get generation(){return generation;},schedule(fn,delay=0){const own=generation;const id=setTimeout(()=>{timers.delete(id);if(own===generation)fn();},delay);timers.add(id);return id;},cancelAll(){generation+=1;for(const id of timers)clearTimeout(id);timers.clear();}};}

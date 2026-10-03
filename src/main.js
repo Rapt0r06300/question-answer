@@ -1,7 +1,3 @@
-export async function bootstrap() {
-  return { name: 'Question Answer', version: '0.1.0' };
-}
-
-if (typeof window !== 'undefined') {
-  void bootstrap();
-}
+import{createGMStore}from'./storage/gm-store.js';import{loadAppState}from'./storage/migration.js';import{createStateMachine}from'./core/state-machine.js';import{createRuntime}from'./core/runtime.js';import{createCancelableScheduler}from'./autopilot/scheduler.js';import{createAutopilotController}from'./autopilot/controller.js';import{createOverlay}from'./ui/overlay.js';
+export async function bootstrap(env={}){const w=env.window??globalThis.window,d=env.document??globalThis.document,gm=env.GM??globalThis.GM;if(!w||!d||!gm)return{name:'Question Answer',version:'0.2.0',active:false};const store=createGMStore(gm),app=await loadAppState(store),machine=createStateMachine();let controller;const overlay=createOverlay({document:d,actions:{start:()=>controller?.start(),pause:r=>controller?.pause(r),resume:()=>controller?.resume(),stop:()=>controller?.stop()}});const runtime=createRuntime({location:w.location,document:d,state:machine,profile:app.profile,overlay,approvedHosts:app.settings.approvedHosts});controller=createAutopilotController({runtime,scheduler:createCancelableScheduler(),store});return{name:'Question Answer',version:'0.2.0',active:true,controller,runtime,overlay};}
+if(typeof window!=='undefined')void bootstrap();
