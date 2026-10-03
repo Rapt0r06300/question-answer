@@ -30,10 +30,10 @@ export function discoverQuestions(root) {
   const controls = [...root.querySelectorAll('input:not([type="hidden"]), select, textarea, button[data-answer], button[role="radio"], button[role="checkbox"], [role="radio"], [role="checkbox"]')]; const results = []; const grouped = new Map();
   controls.forEach((control, index) => {
     const kind = controlKind(control); if (!kind) return;
-    if (kind === 'radio-group' || kind === 'checkbox-group') {
+    if (kind === 'radio-group' || kind === 'checkbox-group' || kind === 'button-card') {
       const nativeName=String(control.name||'').trim();const question=labelledText(control,root);const container=control.closest?.('[role="group"],[data-question],fieldset');const containerKey=container?.id||container?.getAttribute?.('data-question')||question;const groupKey=`${kind}:${nativeName||containerKey||`anon-${index}`}`; let group = grouped.get(groupKey);
       if (!group) { group = { kind, questionText: labelledText(control, root), controls: [], options: [] }; grouped.set(groupKey, group); results.push(group); }
-      group.controls.push(control); group.options.push({ label: optionLabel(control, root), value: control.value, control }); if (!group.questionText) group.questionText = labelledText(control, root); return;
+      group.controls.push(control); group.options.push({ label: optionLabel(control, root), value: control.value || control.getAttribute?.('data-answer') || optionLabel(control, root), control }); if (!group.questionText) group.questionText = labelledText(control, root); return;
     }
     const options = kind === 'select' ? [...(control.options ?? [])].map((option) => ({ label: textOf(option) || String(option.label ?? ''), value: option.value, control: option })) : kind === 'button-card' ? [{ label: optionLabel(control, root), value: control.value || control.getAttribute?.('data-answer') || optionLabel(control, root), control }] : [];
     results.push({ kind, questionText: labelledText(control, root), controls: [control], options });
