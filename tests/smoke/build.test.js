@@ -10,7 +10,7 @@ test('build emits installable Safari Userscripts metadata', () => {
   rmSync(output, { force: true });
   execFileSync(process.execPath, ['scripts/build-userscript.mjs'], { cwd: root, stdio: 'pipe' });
   const built = readFileSync(output, 'utf8');
-  for (const expected of ['@name         Question Answer','@version      0.5.1','@match        https://monetize.primeearn.com/*','@match        https://*.primeearn.com/*','@grant        GM.getValue','@grant        GM.setValue',
+  for (const expected of ['@name         Question Answer','@version      0.5.2','@match        https://monetize.primeearn.com/*','@match        https://*.primeearn.com/*','@grant        GM.getValue','@grant        GM.setValue',
     '@updateURL    https://rapt0r06300.github.io/question-answer/dist/question-answer.meta.js',
     '@downloadURL  https://rapt0r06300.github.io/question-answer/dist/question-answer.user.js','@inject-into  content']) {
     assert.match(built, new RegExp(expected.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
