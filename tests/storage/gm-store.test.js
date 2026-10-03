@@ -21,3 +21,19 @@ test('GM store gets fallback, persists JSON values, and removes keys', async () 
   await store.remove('profile');
   assert.equal(await store.get('profile', null), null);
 });
+
+
+test('localStorage fallback works when Userscripts GM object is unavailable', async () => {
+  const values = new Map();
+  const localStorage = {
+    getItem(key) { return values.has(key) ? values.get(key) : null; },
+    setItem(key, value) { values.set(key, String(value)); },
+    removeItem(key) { values.delete(key); },
+  };
+  const store = createGMStore(undefined, localStorage);
+  assert.deepEqual(await store.get('missing', { ok: true }), { ok: true });
+  await store.set('profile', { schemaVersion: 1, nested: ['ios'] });
+  assert.deepEqual(await store.get('profile', null), { schemaVersion: 1, nested: ['ios'] });
+  await store.remove('profile');
+  assert.equal(await store.get('profile', null), null);
+});
