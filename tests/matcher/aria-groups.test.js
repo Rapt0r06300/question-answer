@@ -1,0 +1,3 @@
+import test from'node:test';import assert from'node:assert/strict';import{discoverQuestions}from'../../src/matcher/field-discovery.js';
+function option(label,value){const container={id:'q1',getAttribute:()=>null};return{tagName:'DIV',type:'',name:'',id:value,value,textContent:label,labels:[],getAttribute:k=>k==='role'?'radio':k==='aria-label'?label:null,closest:s=>s.includes('role="group"')?container:null}}
+test('groups ARIA radio choices into one semantic question',()=>{const a=option('Oui','yes'),b=option('Non','no');const root={querySelectorAll:()=>[a,b],getElementById:()=>null,querySelector:()=>null};const found=discoverQuestions(root);assert.equal(found.length,1);assert.equal(found[0].options.length,2);assert.equal(found[0].options[1].control,b)});
