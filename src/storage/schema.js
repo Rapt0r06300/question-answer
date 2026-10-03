@@ -1,0 +1,28 @@
+export const STORAGE_KEYS = Object.freeze({
+  profile: 'qa.profile.v1',
+  mappings: 'qa.mappings.v1',
+  outcomes: 'qa.outcomes.v1',
+  settings: 'qa.settings.v1',
+  migrations: 'qa.migrations',
+});
+
+export function createDefaultState() {
+  return {
+    profile: { schemaVersion: 1, fields: {} },
+    mappings: { schemaVersion: 1, items: {} },
+    outcomes: { schemaVersion: 1, items: [] },
+    settings: {
+      schemaVersion: 1,
+      approvedHosts: ['monetize.primeearn.com'],
+      providerDiscoveryUntil: 0,
+      debug: false,
+      autoAdvance: true,
+    },
+    migrations: { schemaVersion: 1, applied: [] },
+    recovery: {},
+  };
+}
+
+export function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
