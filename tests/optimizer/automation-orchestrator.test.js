@@ -24,3 +24,6 @@ test('orchestrator opens chosen ZBD activity then switches to JustPlay when read
   assert.equal(result.kind, 'JUSTPLAY_READY');
   assert.equal(opened.at(-1).target, 'justplay://');
 });
+
+
+test('orchestrator launches a DOM-only survey without href',async()=>{const calls=[];const o=createEarnOrchestrator({openTarget:async(target,meta)=>{calls.push({target,meta});return true}});const element={click(){}};const result=await o.tick({justPlay:{schemaVersion:1},opportunities:[{id:'dom-survey',source:'survey',element}]});assert.equal(calls.length,1);assert.equal(calls[0].target,null);assert.equal(calls[0].meta.opportunity.element,element);assert.equal(result.opened,true)});
