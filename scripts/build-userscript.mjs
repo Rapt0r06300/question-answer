@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entry = path.join(root, 'src', 'main.js');
@@ -21,8 +22,8 @@ const metadata = `// ==UserScript==
 // @run-at       document-idle
 // ==/UserScript==`;
 
-const importPattern = /import\s+[^;]*?\s+from\s+['"](.+?)['"]\s*;?/g;
-const sideEffectImportPattern = /import\s+['"](.+?)['"]\s*;?/g;
+const importPattern = /import\s*[^;]*?\s*from\s*['"](.+?)['"]\s*;?/g;
+const sideEffectImportPattern = /import\s*['"](.+?)['"]\s*;?/g;
 
 async function bundleModule(file, seen = new Set()) {
   const resolved = path.resolve(file);
@@ -49,3 +50,4 @@ await mkdir(path.dirname(output), { recursive: true });
 const code = await bundleModule(entry);
 if (/\bimport\s+[^;]+\s+from\s+['\"]/m.test(code) || /\bexport\s+(?=(?:async\s+)?(?:function|class|const|let|var|\{))/m.test(code)) throw new Error('Bundled userscript still contains ESM syntax');
 await writeFile(output, `${metadata}\n\n(() => {\n'use strict';\n${code}\n})();\n`, 'utf8');
+execFileSync(process.execPath, ['--check', output], { stdio: 'inherit' });
