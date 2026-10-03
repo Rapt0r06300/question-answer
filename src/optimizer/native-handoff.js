@@ -1,0 +1,1 @@
+const SAFE=/^(https?:|zbd:)/i;export function createNativeAction(opportunity){const target=typeof opportunity?.launchTarget==='string'&&SAFE.test(opportunity.launchTarget)?opportunity.launchTarget:null;return{kind:'human-native-action',label:opportunity?.rewardedAd?'OUVRIR POUR LA PUB RÉCOMPENSÉE':'OUVRIR DANS L’APP',target,requiresHumanAction:true};}
