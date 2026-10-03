@@ -6,12 +6,15 @@ import { execFileSync } from 'node:child_process';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const entry = path.join(root, 'src', 'main.js');
 const output = path.join(root, 'dist', 'question-answer.user.js');
+const metaOutput = path.join(root, 'dist', 'question-answer.meta.js');
 
 const metadata = `// ==UserScript==
 // @name         Question Answer
 // @namespace    https://github.com/Rapt0r06300/question-answer
-// @version      0.5.0
+// @version      0.5.1
 // @description  iPhone-first truthful survey assistant for Safari Userscripts
+// @updateURL    https://rapt0r06300.github.io/question-answer/dist/question-answer.meta.js
+// @downloadURL  https://rapt0r06300.github.io/question-answer/dist/question-answer.user.js
 // @match        https://monetize.primeearn.com/*
 // @match        https://*.primeearn.com/*
 // @grant        GM.getValue
@@ -51,3 +54,4 @@ const code = await bundleModule(entry);
 if (/\bimport\s+[^;]+\s+from\s+['\"]/m.test(code) || /\bexport\s+(?=(?:async\s+)?(?:function|class|const|let|var|\{))/m.test(code)) throw new Error('Bundled userscript still contains ESM syntax');
 await writeFile(output, `${metadata}\n\n(() => {\n'use strict';\n${code}\n})();\n`, 'utf8');
 execFileSync(process.execPath, ['--check', output], { stdio: 'inherit' });
+await writeFile(metaOutput, `${metadata}\n`, 'utf8');
