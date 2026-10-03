@@ -1,7 +1,7 @@
 # Question Answer — iPhone Survey Assistant Design
 
 Date: 2026-10-03
-Status: DESIGN APPROVAL PENDING WRITTEN-SPEC REVIEW
+Status: WRITTEN SPEC READY FOR USER REVIEW
 Repository: Rapt0r06300/question-answer
 Default branch: main
 
@@ -65,7 +65,9 @@ The preferred iPhone runtime is the open-source “Userscripts” Safari extensi
 
 The project will ship a userscript with:
 
-- `@match` rules for known providers plus a carefully scoped generic mode;
+Privacy rule: even if Safari/Userscripts permissions are broad enough to allow injection on multiple websites, Question Answer must not inspect page content on an unapproved hostname. The runtime checks the local allowlist before scanning the DOM. New provider domains require explicit user approval before generic scanning is enabled.
+
+- `@match` rules sufficient for known providers and, only if generic cross-provider support requires it, a broader match combined with a strict local runtime domain allowlist that defaults to PrimeEarn/explicitly approved survey hosts and immediately no-ops everywhere else;
 - `@grant GM.getValue`;
 - `@grant GM.setValue`;
 - `@grant GM.deleteValue` where supported/needed;
@@ -523,7 +525,7 @@ Distribution files:
 - `dist/question-answer.user.js`
 - `dist/question-answer.meta.js`
 
-The user installs the userscript from a stable GitHub Pages URL ending in `.user.js`.
+The preferred install URL is a stable GitHub Pages path ending in `.user.js`. A raw GitHub file URL ending in `.user.js` is the documented fallback when Pages is not yet enabled or temporarily unavailable.
 
 Because automatic userscript update implementations can vary, the assistant must also include a visible local “Check version” function that compares only non-sensitive version metadata from the static site.
 
@@ -650,7 +652,7 @@ Do not pre-build speculative provider integrations without real pages/evidence.
 V1 is complete when:
 
 - the repository is installable on an iPhone with no PC;
-- the GitHub Pages onboarding page works;
+- the GitHub Pages onboarding assets are complete and deployable; if Pages cannot be enabled through the available GitHub connector, the documented raw-GitHub installer fallback works until the user enables Pages in repository settings;
 - the stable `.user.js` installs through Userscripts;
 - profile data persists locally across supported survey domains;
 - PrimeEarn pages are detected;
