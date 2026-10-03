@@ -10,8 +10,9 @@ function labelledText(control, root) {
   const fieldset = control?.closest?.('fieldset'); const legend = fieldset?.querySelector?.('legend'); if (textOf(legend)) return textOf(legend);
   if (control?.labels?.length) { const text = [...control.labels].map(textOf).filter(Boolean).join(' '); if (text) return text; }
   if (control?.id && root?.querySelector) { const escaped = String(control.id).replace(/["\\]/g, '\\$&'); const label = root.querySelector(`label[for="${escaped}"]`); if (textOf(label)) return textOf(label); }
-  const questionContainer = control?.closest?.('[data-question], [role="group"]');
-  if (questionContainer) { const explicit = questionContainer.getAttribute?.('data-question'); if (explicit?.trim()) return explicit.trim(); }
+  const questionContainer = control?.closest?.('[data-question], [role="group"], fieldset, form, section, article, li, div');
+  if (questionContainer) { const explicit = questionContainer.getAttribute?.('data-question'); if (explicit?.trim()) return explicit.trim(); const heading=questionContainer.querySelector?.('legend,h1,h2,h3,h4,h5,h6,[role="heading"],p,label'); const text=textOf(heading); if(text&&text.length<=300)return text; }
+  const placeholder=control?.getAttribute?.('placeholder'); if(placeholder?.trim())return placeholder.trim();
   return '';
 }
 function optionLabel(control, root) {
@@ -22,11 +23,11 @@ function optionLabel(control, root) {
 }
 function controlKind(control) {
   const tag = String(control?.tagName ?? '').toUpperCase(); const type = String(control?.type ?? '').toLowerCase();
-  if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null) return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
+  if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null || control?.getAttribute?.('role')==='radio' || control?.getAttribute?.('role')==='checkbox') return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
 }
 export function discoverQuestions(root) {
   if (!root?.querySelectorAll) return [];
-  const controls = [...root.querySelectorAll('input, select, textarea, button[data-answer], button[role="radio"], button[role="checkbox"]')]; const results = []; const grouped = new Map();
+  const controls = [...root.querySelectorAll('input:not([type="hidden"]), select, textarea, button[data-answer], button[role="radio"], button[role="checkbox"], [role="radio"], [role="checkbox"]')]; const results = []; const grouped = new Map();
   controls.forEach((control, index) => {
     const kind = controlKind(control); if (!kind) return;
     if (kind === 'radio-group' || kind === 'checkbox-group') {
