@@ -20,8 +20,8 @@ const metadata = `// ==UserScript==
 // @run-at       document-idle
 // ==/UserScript==`;
 
-const importPattern = /^\s*import\s+.*?from\s+['"](.+?)['"];?\s*$/gm;
-const sideEffectImportPattern = /^\s*import\s+['"](.+?)['"];?\s*$/gm;
+const importPattern = /import\s+[^;]*?\s+from\s+['"](.+?)['"]\s*;?/g;
+const sideEffectImportPattern = /import\s+['"](.+?)['"]\s*;?/g;
 
 async function bundleModule(file, seen = new Set()) {
   const resolved = path.resolve(file);
