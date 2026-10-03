@@ -15,6 +15,7 @@ function labelledText(control, root) {
   const placeholder=control?.getAttribute?.('placeholder'); if(placeholder?.trim())return placeholder.trim();
   return '';
 }
+function groupQuestionText(control,root){const container=control?.closest?.('[role="group"],[data-question],fieldset');if(container){const explicit=container.getAttribute?.('data-question');if(explicit?.trim())return explicit.trim();const by=container.getAttribute?.('aria-labelledby');if(by?.trim()&&root?.getElementById){const t=by.trim().split(/\s+/).map(id=>textOf(root.getElementById(id))).filter(Boolean).join(' ');if(t)return t}const heading=container.querySelector?.('legend,h1,h2,h3,h4,h5,h6,[role="heading"],p');const t=textOf(heading);if(t)return t}return labelledText(control,root)}
 function optionLabel(control, root) {
   if (control?.labels?.length) { const text = [...control.labels].map(textOf).filter(Boolean).join(' '); if (text) return text; }
   const ariaLabel = control?.getAttribute?.('aria-label'); if (ariaLabel?.trim()) return ariaLabel.trim();
@@ -31,9 +32,9 @@ export function discoverQuestions(root) {
   controls.forEach((control, index) => {
     const kind = controlKind(control); if (!kind) return;
     if (kind === 'radio-group' || kind === 'checkbox-group' || kind === 'button-card') {
-      const nativeName=String(control.name||'').trim();const question=labelledText(control,root);const container=control.closest?.('[role="group"],[data-question],fieldset');const containerKey=container?.id||container?.getAttribute?.('data-question')||question;const groupKey=`${kind}:${nativeName||containerKey||`anon-${index}`}`; let group = grouped.get(groupKey);
-      if (!group) { group = { kind, questionText: labelledText(control, root), controls: [], options: [] }; grouped.set(groupKey, group); results.push(group); }
-      group.controls.push(control); group.options.push({ label: optionLabel(control, root), value: control.value || control.getAttribute?.('data-answer') || optionLabel(control, root), control }); if (!group.questionText) group.questionText = labelledText(control, root); return;
+      const nativeName=String(control.name||'').trim();const question=groupQuestionText(control,root);const container=control.closest?.('[role="group"],[data-question],fieldset');const containerKey=container?.id||container?.getAttribute?.('data-question')||question;const groupKey=`${kind}:${nativeName||containerKey||`anon-${index}`}`; let group = grouped.get(groupKey);
+      if (!group) { group = { kind, questionText: question, controls: [], options: [] }; grouped.set(groupKey, group); results.push(group); }
+      group.controls.push(control); group.options.push({ label: optionLabel(control, root), value: control.value || control.getAttribute?.('data-answer') || optionLabel(control, root), control }); if (!group.questionText) group.questionText = question; return;
     }
     const options = kind === 'select' ? [...(control.options ?? [])].map((option) => ({ label: textOf(option) || String(option.label ?? ''), value: option.value, control: option })) : kind === 'button-card' ? [{ label: optionLabel(control, root), value: control.value || control.getAttribute?.('data-answer') || optionLabel(control, root), control }] : [];
     results.push({ kind, questionText: labelledText(control, root), controls: [control], options });
