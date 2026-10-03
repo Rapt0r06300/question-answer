@@ -9,7 +9,8 @@ export function createEarnOrchestrator({ openTarget, notify, clock = () => Date.
     },
 
     async tick({ justPlay, opportunities }) {
-      const decision = chooseCooldownAction({ justPlay, opportunities, now: clock() });
+      const hasJustPlay=Boolean(justPlay&&justPlay.lastClaimAt&&justPlay.cooldownMs);
+      const decision = hasJustPlay ? chooseCooldownAction({ justPlay, opportunities, now: clock() }) : (opportunities?.length ? {kind:'ZBD_ACTIVITY',opportunity:opportunities[0],requiresHumanAction:Boolean(opportunities[0]?.requiresHumanAction)} : {kind:'WAIT_FOR_OPPORTUNITY'});
 
       if (decision.kind === 'JUSTPLAY_READY') {
         const preemption = shouldPreemptForJustPlay({ currentActivity, justPlay, now: clock() });
