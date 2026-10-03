@@ -1,0 +1,6 @@
+import test from'node:test';import assert from'node:assert/strict';import{chooseAccessibilityMethod,createAccessibilityCoordinator}from'../../src/accessibility/coordinator.js';
+const candidate={text:'Close',score:.97,rect:{left:350,top:10,width:30,height:30}};
+test('JustPlay prefers named accessible candidate',()=>{const r=chooseAccessibilityMethod({context:{app:'justplay'},capabilities:{accessibleCandidate:true,voiceControl:true},candidate});assert.equal(r.method,'named-element');assert.equal(r.profile.id,'justplay');});
+test('falls back to Voice Control numbers',()=>{const r=chooseAccessibilityMethod({context:{app:'justplay'},capabilities:{voiceControl:true},candidate});assert.equal(r.method,'voice-numbers');});
+test('commercial CTA is blocked',()=>{assert.equal(chooseAccessibilityMethod({context:{app:'justplay'},capabilities:{voiceControl:true},candidate:{...candidate,text:'Install'}}).kind,'blocked');});
+test('panic pauses coordinator until resume',()=>{const c=createAccessibilityCoordinator({capabilities:{voiceControl:true}});assert.equal(c.panic().kind,'paused');assert.equal(c.evaluate({candidate,context:{app:'justplay'}}).kind,'paused');c.resume();assert.equal(c.evaluate({candidate,context:{app:'justplay'}}).kind,'assist');});
