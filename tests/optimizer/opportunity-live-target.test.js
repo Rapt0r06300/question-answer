@@ -1,0 +1,2 @@
+import test from'node:test';import assert from'node:assert/strict';import{normalizeOpportunity}from'../../src/optimizer/opportunity.js';import{rankEarnOpportunities}from'../../src/optimizer/ranking.js';
+test('live DOM click target survives normalization and ranking',()=>{const element={click(){}};const raw={id:'p',source:'survey',provider:'primeearn',rewardSats:512,estimatedMinutes:7,element,interruptibility:'non-interruptible',available:true};assert.equal(normalizeOpportunity(raw).element,element);assert.equal(rankEarnOpportunities([raw],{})[0].element,element)});
