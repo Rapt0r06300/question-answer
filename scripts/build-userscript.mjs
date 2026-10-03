@@ -11,12 +11,13 @@ const metaOutput = path.join(root, 'dist', 'question-answer.meta.js');
 const metadata = `// ==UserScript==
 // @name         Question Answer
 // @namespace    https://github.com/Rapt0r06300/question-answer
-// @version      0.5.4
+// @version      0.6.0
 // @description  iPhone-first truthful survey assistant for Safari Userscripts
 // @updateURL    https://rapt0r06300.github.io/question-answer/dist/question-answer.meta.js
 // @downloadURL  https://rapt0r06300.github.io/question-answer/dist/question-answer.user.js
 // @match        https://monetize.primeearn.com/*
 // @match        https://*.primeearn.com/*
+// @match        https://*/*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        GM.deleteValue
