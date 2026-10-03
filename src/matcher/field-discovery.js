@@ -23,7 +23,7 @@ function optionLabel(control, root) {
 }
 function controlKind(control) {
   const tag = String(control?.tagName ?? '').toUpperCase(); const type = String(control?.type ?? '').toLowerCase();
-  if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null || control?.getAttribute?.('role')==='radio' || control?.getAttribute?.('role')==='checkbox') return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
+  if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (control?.getAttribute?.('role')==='radio') return 'radio-group'; if (control?.getAttribute?.('role')==='checkbox') return 'checkbox-group'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null) return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
 }
 export function discoverQuestions(root) {
   if (!root?.querySelectorAll) return [];
@@ -31,7 +31,7 @@ export function discoverQuestions(root) {
   controls.forEach((control, index) => {
     const kind = controlKind(control); if (!kind) return;
     if (kind === 'radio-group' || kind === 'checkbox-group') {
-      const groupKey = `${kind}:${control.name || control.id || `anon-${index}`}`; let group = grouped.get(groupKey);
+      const nativeName=String(control.name||'').trim();const question=labelledText(control,root);const container=control.closest?.('[role="group"],[data-question],fieldset');const containerKey=container?.id||container?.getAttribute?.('data-question')||question;const groupKey=`${kind}:${nativeName||containerKey||`anon-${index}`}`; let group = grouped.get(groupKey);
       if (!group) { group = { kind, questionText: labelledText(control, root), controls: [], options: [] }; grouped.set(groupKey, group); results.push(group); }
       group.controls.push(control); group.options.push({ label: optionLabel(control, root), value: control.value, control }); if (!group.questionText) group.questionText = labelledText(control, root); return;
     }
