@@ -1,17 +1,1 @@
-export function createGMStore(gm) {
-  if (!gm || typeof gm.getValue !== 'function' || typeof gm.setValue !== 'function') {
-    throw new TypeError('Userscripts GM.getValue and GM.setValue are required');
-  }
-  return {
-    async get(namespace, fallback) {
-      return gm.getValue(namespace, fallback);
-    },
-    async set(namespace, value) {
-      await gm.setValue(namespace, value);
-    },
-    async remove(namespace) {
-      if (typeof gm.deleteValue === 'function') await gm.deleteValue(namespace);
-      else await gm.setValue(namespace, undefined);
-    },
-  };
-}
+export function createGMStore(gm,localStorage){const hasGM=Boolean(gm&&typeof gm.getValue==='function'&&typeof gm.setValue==='function');const hasLocal=Boolean(localStorage&&typeof localStorage.getItem==='function'&&typeof localStorage.setItem==='function');if(!hasGM&&!hasLocal)throw new TypeError('A persistent Userscripts or localStorage store is required');const parse=(raw,fallback)=>{if(raw==null)return fallback;try{return JSON.parse(raw)}catch{return fallback}};return{async get(namespace,fallback){return hasGM?gm.getValue(namespace,fallback):parse(localStorage.getItem(namespace),fallback)},async set(namespace,value){if(hasGM)await gm.setValue(namespace,value);else localStorage.setItem(namespace,JSON.stringify(value))},async remove(namespace){if(hasGM){if(typeof gm.deleteValue==='function')await gm.deleteValue(namespace);else await gm.setValue(namespace,undefined)}else localStorage.removeItem(namespace)}}}
