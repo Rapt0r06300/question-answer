@@ -65,7 +65,7 @@ function migrateMigrations(raw) {
 
 export async function loadAppState(store) {
   const recovery = {};
-  const [profileRaw, mappingsRaw, outcomesRaw, settingsRaw, migrationsRaw, gameSessionsRaw, opportunityHistoryRaw] = await Promise.all([
+  const [profileRaw, mappingsRaw, outcomesRaw, settingsRaw, migrationsRaw, gameSessionsRaw, opportunityHistoryRaw, justPlayRaw] = await Promise.all([
     store.get(STORAGE_KEYS.profile, null),
     store.get(STORAGE_KEYS.mappings, null),
     store.get(STORAGE_KEYS.outcomes, null),
@@ -73,6 +73,7 @@ export async function loadAppState(store) {
     store.get(STORAGE_KEYS.migrations, null),
     store.get(STORAGE_KEYS.gameSessions, null),
     store.get(STORAGE_KEYS.opportunityHistory, null),
+    store.get(STORAGE_KEYS.justPlay, null),
   ]);
   return {
     profile: migrateProfile(profileRaw, recovery),
@@ -82,6 +83,7 @@ export async function loadAppState(store) {
     migrations: migrateMigrations(migrationsRaw),
     gameSessions: isPlainObject(gameSessionsRaw) && Array.isArray(gameSessionsRaw.items) ? { schemaVersion: 1, items: structuredClone(gameSessionsRaw.items) } : { schemaVersion: 1, items: [] },
     opportunityHistory: isPlainObject(opportunityHistoryRaw) && Array.isArray(opportunityHistoryRaw.items) ? { schemaVersion: 1, items: structuredClone(opportunityHistoryRaw.items) } : { schemaVersion: 1, items: [] },
+    justPlay: isPlainObject(justPlayRaw) ? { ...createDefaultState().justPlay, ...structuredClone(justPlayRaw), schemaVersion: 1 } : createDefaultState().justPlay,
     recovery,
   };
 }
@@ -95,5 +97,6 @@ export async function saveAppState(store, state) {
     store.set(STORAGE_KEYS.migrations, state.migrations ?? { schemaVersion: 1, applied: [] }),
     store.set(STORAGE_KEYS.gameSessions, state.gameSessions ?? { schemaVersion: 1, items: [] }),
     store.set(STORAGE_KEYS.opportunityHistory, state.opportunityHistory ?? { schemaVersion: 1, items: [] }),
+    store.set(STORAGE_KEYS.justPlay, state.justPlay ?? createDefaultState().justPlay),
   ]);
 }
