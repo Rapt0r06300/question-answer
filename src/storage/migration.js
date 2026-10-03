@@ -65,12 +65,14 @@ function migrateMigrations(raw) {
 
 export async function loadAppState(store) {
   const recovery = {};
-  const [profileRaw, mappingsRaw, outcomesRaw, settingsRaw, migrationsRaw] = await Promise.all([
+  const [profileRaw, mappingsRaw, outcomesRaw, settingsRaw, migrationsRaw, gameSessionsRaw, opportunityHistoryRaw] = await Promise.all([
     store.get(STORAGE_KEYS.profile, null),
     store.get(STORAGE_KEYS.mappings, null),
     store.get(STORAGE_KEYS.outcomes, null),
     store.get(STORAGE_KEYS.settings, null),
     store.get(STORAGE_KEYS.migrations, null),
+    store.get(STORAGE_KEYS.gameSessions, null),
+    store.get(STORAGE_KEYS.opportunityHistory, null),
   ]);
   return {
     profile: migrateProfile(profileRaw, recovery),
@@ -78,6 +80,8 @@ export async function loadAppState(store) {
     outcomes: migrateOutcomes(outcomesRaw),
     settings: migrateSettings(settingsRaw),
     migrations: migrateMigrations(migrationsRaw),
+    gameSessions: isPlainObject(gameSessionsRaw) && Array.isArray(gameSessionsRaw.items) ? { schemaVersion: 1, items: structuredClone(gameSessionsRaw.items) } : { schemaVersion: 1, items: [] },
+    opportunityHistory: isPlainObject(opportunityHistoryRaw) && Array.isArray(opportunityHistoryRaw.items) ? { schemaVersion: 1, items: structuredClone(opportunityHistoryRaw.items) } : { schemaVersion: 1, items: [] },
     recovery,
   };
 }
@@ -89,5 +93,7 @@ export async function saveAppState(store, state) {
     store.set(STORAGE_KEYS.outcomes, state.outcomes),
     store.set(STORAGE_KEYS.settings, state.settings),
     store.set(STORAGE_KEYS.migrations, state.migrations ?? { schemaVersion: 1, applied: [] }),
+    store.set(STORAGE_KEYS.gameSessions, state.gameSessions ?? { schemaVersion: 1, items: [] }),
+    store.set(STORAGE_KEYS.opportunityHistory, state.opportunityHistory ?? { schemaVersion: 1, items: [] }),
   ]);
 }
