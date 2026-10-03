@@ -1,0 +1,6 @@
+import{estimateObservedSatsPerMinute}from'./game-sessions.js';import{createNativeAction}from'./native-handoff.js';
+export const DEFAULT_GAME_CAP_SATS=500;
+function earnedFor(sessions,key){return sessions.reduce((sum,s)=>sum+(s?.key===key&&Number.isFinite(Number(s.earnedSats))?Math.max(0,Number(s.earnedSats)):0),0);}
+export function buildGameRotation({games=[],sessions=[],capSats=DEFAULT_GAME_CAP_SATS}={}){const cap=Math.max(1,Number(capSats)||DEFAULT_GAME_CAP_SATS);return games.map(game=>{const key=String(game.id??game.key??game.title??''),earnedSats=earnedFor(sessions,key),remainingSats=Math.max(0,cap-earnedSats),rate=estimateObservedSatsPerMinute(sessions,key);return{...game,id:key,earnedSats,remainingSats,capSats:cap,capReached:remainingSats<=0,observedSatsPerMinute:rate,requiresHumanAction:true,nativeAction:createNativeAction({...game,source:'game',requiresNativeApp:true})};}).sort((a,b)=>{if(a.capReached!==b.capReached)return a.capReached?1:-1;const ar=a.observedSatsPerMinute??-1,br=b.observedSatsPerMinute??-1;if(br!==ar)return br-ar;return b.remainingSats-a.remainingSats;});}
+export function nextGame(rotation,currentId=null){return rotation.find(g=>!g.capReached&&g.id!==currentId)??null;}
+export function shouldRotate(game){return Boolean(game?.capReached);}
