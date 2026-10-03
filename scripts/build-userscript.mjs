@@ -9,9 +9,10 @@ const output = path.join(root, 'dist', 'question-answer.user.js');
 const metadata = `// ==UserScript==
 // @name         Question Answer
 // @namespace    https://github.com/Rapt0r06300/question-answer
-// @version      0.1.0
+// @version      0.5.0
 // @description  iPhone-first truthful survey assistant for Safari Userscripts
-// @match        https://*/*
+// @match        https://monetize.primeearn.com/*
+// @match        https://*.primeearn.com/*
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        GM.deleteValue
@@ -39,11 +40,12 @@ async function bundleModule(file, seen = new Set()) {
   let prefix = '';
   for (const dependency of dependencies) prefix += `${await bundleModule(dependency, seen)}\n`;
   source = source.replace(importPattern, '').replace(sideEffectImportPattern, '');
-  source = source.replace(/^\s*export\s+(?=(async\s+)?(function|class|const|let|var)\b)/gm, '');
-  source = source.replace(/^\s*export\s*\{[^}]*\};?\s*$/gm, '');
+  source = source.replace(/\bexport\s+(?=(?:async\s+)?(?:function|class|const|let|var)\b)/g, '');
+  source = source.replace(/\bexport\s*\{[^}]*\};?/g, '');
   return `${prefix}\n${source}`;
 }
 
 await mkdir(path.dirname(output), { recursive: true });
 const code = await bundleModule(entry);
+if (/\bimport\s+[^;]+\s+from\s+['\"]/m.test(code) || /\bexport\s+(?=(?:async\s+)?(?:function|class|const|let|var|\{))/m.test(code)) throw new Error('Bundled userscript still contains ESM syntax');
 await writeFile(output, `${metadata}\n\n(() => {\n'use strict';\n${code}\n})();\n`, 'utf8');
