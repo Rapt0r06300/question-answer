@@ -7,12 +7,12 @@ Default branch: main
 
 ## 1. Product intent
 
-Question Answer is an iPhone-first survey assistant for rewarded survey flows reached from ZBD and PrimeEarn.
+Question Answer is an iPhone-first survey assistant for rewarded survey flows reached from ZBD and PrimeEarn. Safari is the required execution browser for V1 because the Userscripts extension integrates with Safari on iOS.
 
 The north-star user experience is:
 
 1. The user starts from ZBD on an iPhone.
-2. The survey flow opens PrimeEarn or a downstream survey provider.
+2. The survey flow opens PrimeEarn or a downstream survey provider in Safari whenever possible.
 3. If the page is inside an in-app browser/WebView where Safari extensions cannot run, the user hands the exact URL to Safari without altering attribution/query parameters.
 4. A Safari userscript recognizes the page, loads the user's locally stored truthful profile, fills recurring answers, and advances only where safe.
 5. Unknown or subjective questions are surfaced to the user in a compact overlay and may be remembered after explicit user choice.
@@ -26,6 +26,7 @@ The product exists to reduce repetitive work and wasted time, not to fabricate e
 ### Hard constraints
 
 - iPhone-first. No dependency on the user's PC.
+- Safari is the supported execution browser for V1. Brave may remain the user's general browser, but Question Answer does not depend on Brave iOS extension support.
 - GitHub hosts source code, documentation, static assets, tests, and optional GitHub Pages.
 - Personal profile data and survey-response history must not be committed to the public repository.
 - Persistent user data must default to local device storage exposed by the userscript manager (prefer asynchronous `GM.getValue` / `GM.setValue`).
@@ -399,7 +400,7 @@ No CAPTCHA solving service, token injection, challenge replay, fingerprint spoof
 
 ## 17. ZBD in-app browser / Safari handoff
 
-Safari extensions generally do not execute inside another app's private WKWebView.
+Safari extensions generally do not execute inside another app's private WKWebView. V1 therefore treats Safari as the canonical execution browser and documents a handoff from any ZBD in-app browser to Safari when needed.
 
 Therefore the product must include a handoff guide, not pretend this can always be automated.
 
@@ -683,6 +684,7 @@ No extension point may weaken the anti-fraud boundaries in this spec.
 Chosen:
 
 - iPhone execution.
+- Safari as the canonical execution browser.
 - Safari + Userscripts.
 - GitHub for source/static distribution/testing.
 - GM storage for cross-domain local persistence.
