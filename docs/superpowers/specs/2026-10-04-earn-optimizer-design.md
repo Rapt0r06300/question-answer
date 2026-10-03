@@ -167,3 +167,31 @@ Required tests:
 - userscript remains the Safari web runtime.
 - no PC dependency.
 - GitHub Actions may build/test/deploy static assets only; it must not run reward farming or remote browser automation.
+
+
+## 8. Safari Autopilot and permanent kill-switch
+
+The Safari userscript exposes an explicit Autopilot mode for approved web survey pages.
+
+Controls:
+- COMMENCER: starts scanning/filling the current approved Safari survey context.
+- REPRENDRE LE CONTRÔLE: permanent visible kill-switch while Autopilot is active. It synchronously disables automatic filling/navigation, disconnects observers, cancels pending timers/actions where possible, and persists PAUSED state.
+- CONTINUER: user-only action that resumes from a fresh scan after PAUSED.
+- ARRÊTER: ends the current session and clears pending progression state.
+
+Rules:
+- Autopilot controls only DOM/content available to the Safari userscript on locally approved hosts.
+- It never controls the global iOS interface or another native app.
+- Navigation is bounded and loop-protected.
+- The kill-switch remains visible above the assistant UI while automatic behavior is active.
+- pagehide/visibility/navigation changes invalidate pending actions; continuation requires a fresh runtime check.
+- unknown/ambiguous/sensitive questions, inaccessible frames and verification challenges automatically yield control to the user.
+- no CAPTCHA solving, anti-bot bypass, fingerprint spoofing, rewarded-ad automation, native-game automation, or hidden clicking.
+
+Acceptance tests:
+- COMMENCER enters active Autopilot only on an approved host.
+- REPRENDRE LE CONTRÔLE prevents a queued answer/navigation from executing.
+- observer/timer callbacks after pause are inert.
+- CONTINUER performs a fresh scan rather than replaying stale DOM handles.
+- verification and inaccessible-frame states force PAUSED/human control.
+- the kill-switch is keyboard/touch accessible and cannot be hidden by survey page CSS (shadow-root/isolated fixed overlay).
