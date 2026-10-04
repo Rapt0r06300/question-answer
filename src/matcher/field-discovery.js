@@ -24,11 +24,11 @@ function optionLabel(control, root) {
 }
 function controlKind(control) {
   const tag = String(control?.tagName ?? '').toUpperCase(); const type = String(control?.type ?? '').toLowerCase();
-  if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (control?.getAttribute?.('role')==='radio') return 'radio-group'; if (control?.getAttribute?.('role')==='checkbox') return 'checkbox-group'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null) return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
+  if (control?.getAttribute?.('role')==='option'||control?.getAttribute?.('role')==='menuitemradio'||control?.getAttribute?.('role')==='menuitemcheckbox') return 'button-card'; if (tag === 'TEXTAREA') return 'textarea'; if (tag === 'SELECT') return 'select'; if (control?.getAttribute?.('role')==='radio') return 'radio-group'; if (control?.getAttribute?.('role')==='checkbox') return 'checkbox-group'; if (tag === 'BUTTON' || control?.getAttribute?.('data-answer') != null) return 'button-card'; if (tag === 'INPUT' && type === 'radio') return 'radio-group'; if (tag === 'INPUT' && type === 'checkbox') return 'checkbox-group'; if (tag === 'INPUT') return 'input'; return null;
 }
 export function discoverQuestions(root) {
   if (!root?.querySelectorAll) return [];
-  const controls = [...root.querySelectorAll('input:not([type="hidden"]), select, textarea, button[data-answer], button[role="radio"], button[role="checkbox"], [role="radio"], [role="checkbox"]')]; const results = []; const grouped = new Map();
+  const controls = [...root.querySelectorAll('input:not([type="hidden"]), select, textarea, button[data-answer], button[role="radio"], button[role="checkbox"], [role="radio"], [role="checkbox"], [role="option"], [role="menuitemradio"], [role="menuitemcheckbox"], [data-answer], [data-option], [data-value]')]; const results = []; const grouped = new Map();
   controls.forEach((control, index) => {
     const kind = controlKind(control); if (!kind) return;
     if (kind === 'radio-group' || kind === 'checkbox-group' || kind === 'button-card') {
