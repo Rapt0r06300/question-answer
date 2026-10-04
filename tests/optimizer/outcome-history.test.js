@@ -1,0 +1,2 @@
+import test from'node:test';import assert from'node:assert/strict';import{observedYield,recordOpportunityOutcome}from'../../src/optimizer/outcome-history.js';
+test('learns observed sats per minute from completed surveys',()=>{const h=[{outcome:'completed',rewardSats:600,durationMinutes:10}];assert.equal(observedYield(h),60)});test('bounds persisted outcome history',()=>{let x=[];for(let i=0;i<510;i++)x=recordOpportunityOutcome(x,{id:'s',outcome:'screened-out',timestamp:i});assert.equal(x.length,500)});
