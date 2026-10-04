@@ -1,0 +1,2 @@
+function selected(c){return c?.checked===true||c?.getAttribute?.('aria-checked')==='true'||c?.getAttribute?.('aria-selected')==='true'||c?.getAttribute?.('data-selected')==='true'||c?.classList?.contains?.('selected')||c?.classList?.contains?.('active')}
+export function captureSelectedAnswer(question){const options=question?.options||[];const values=options.filter(o=>selected(o.control)).map(o=>String(o.value??o.label??'')).filter(Boolean);if(!values.length)return null;return question?.kind==='checkbox-group'||values.length>1?values:values[0]}
