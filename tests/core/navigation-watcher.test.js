@@ -1,0 +1,2 @@
+import test from'node:test';import assert from'node:assert/strict';import{installNavigationWatcher}from'../../src/core/navigation-watcher.js';
+test('notifies when pushState changes questionnaire URL',()=>{let href='https://survey.test/1',calls=0;const listeners={};const history={pushState(){href='https://survey.test/2'},replaceState(){}};const w={get location(){return{href}},history,addEventListener:(n,f)=>listeners[n]=f,removeEventListener(){}};const stop=installNavigationWatcher(w,()=>calls++);history.pushState({},'','/2');assert.equal(calls,1);stop()});
