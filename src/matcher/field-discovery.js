@@ -45,3 +45,5 @@ export function discoverFrames(root) {
   if (!root?.querySelectorAll) return [];
   return [...root.querySelectorAll('iframe')].map((frame) => { try { const document = frame.contentDocument; if (document) return { kind: 'accessible-frame', document, frame }; } catch { return { kind: 'inaccessible-frame', frame }; } return { kind: 'inaccessible-frame', frame }; });
 }
+
+export function discoverOpenShadowRoots(root){if(!root?.querySelectorAll)return[];const out=[];for(const el of root.querySelectorAll('*')){const sr=el?.shadowRoot;if(sr&&sr.mode!=='closed')out.push(sr)}return out;}
