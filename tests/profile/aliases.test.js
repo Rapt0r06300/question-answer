@@ -7,6 +7,7 @@ test('matches high-confidence French and English demographic aliases', () => {
   assert.equal(matchAlias('What is your date of birth?').key, 'demographics.dob');
   assert.equal(matchAlias('Dans quel pays vivez-vous ?').key, 'demographics.country');
   assert.equal(matchAlias('Which best describes your employment status?').key, 'employment.status');
+  assert.equal(matchAlias('Laquelle décrit le mieux votre activité professionnelle ?').key, 'employment.occupationCategory');
   assert.equal(matchAlias('Combien de personnes vivent dans votre foyer ?').key, 'household.size');
 });
 
