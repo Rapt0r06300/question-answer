@@ -1,0 +1,4 @@
+function key(o){return String(o?.id||o?.provider||o?.title||'')}
+export function groupOutcomeHistory(items=[]){const out={};for(const x of items){const k=String(x?.opportunityId||x?.id||'');if(!k)continue;(out[k]??=[]).push(x)}return out}
+export function recordOpportunityOutcome(items=[],entry,limit=500){const clean={opportunityId:key(entry),outcome:entry?.outcome,timestamp:Number(entry?.timestamp)||Date.now(),rewardSats:Number.isFinite(Number(entry?.rewardSats))?Number(entry.rewardSats):null,durationMinutes:Number.isFinite(Number(entry?.durationMinutes))?Number(entry.durationMinutes):null};return[...items,clean].slice(-limit)}
+export function observedYield(history=[]){const completed=history.filter(x=>x?.outcome==='completed'&&Number(x.durationMinutes)>0);if(!completed.length)return null;const sats=completed.reduce((s,x)=>s+(Number(x.rewardSats)||0),0),mins=completed.reduce((s,x)=>s+Number(x.durationMinutes),0);return mins>0?sats/mins:null}
