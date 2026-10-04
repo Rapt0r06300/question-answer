@@ -1,0 +1,2 @@
+function bodyText(root){return String(root?.body?.innerText||root?.documentElement?.innerText||'').replace(/\s+/g,' ').toLowerCase()}
+export function detectSurveyOutcome(root){const t=bodyText(root);if(!t)return null;if(/(merci d avoir participe|thank you for completing|survey complete|questionnaire termine|reward.*credited|recompense.*creditee)/i.test(t))return{outcome:'completed'};if(/(vous ne correspondez pas|vous n etes pas eligible|not a match|not qualified|screened out|quota full|quota complet)/i.test(t))return{outcome:'screened_out'};return null}
