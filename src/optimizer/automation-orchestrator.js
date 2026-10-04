@@ -27,7 +27,7 @@ export function createEarnOrchestrator({ openTarget, notify, clock = () => Date.
         const changed = !currentActivity || currentActivity.id !== next.id;
         currentActivity = next;
         if (changed && (next.launchTarget || next.element)) {
-          const opened=await openTarget?.(next.launchTarget, { kind: 'zbd', opportunity: next });
+          const opened=await openTarget?.(next.launchTarget??null, { kind: 'zbd', opportunity: next });
           return { ...decision, opened:Boolean(opened) };
         }
         return decision;
