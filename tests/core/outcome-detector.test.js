@@ -1,0 +1,2 @@
+import test from'node:test';import assert from'node:assert/strict';import{detectSurveyOutcome}from'../../src/core/outcome-detector.js';
+const root=t=>({body:{innerText:t}});test('detects completion',()=>assert.equal(detectSurveyOutcome(root('Merci d avoir participé au questionnaire')).outcome,'completed'));test('detects screenout',()=>assert.equal(detectSurveyOutcome(root('Vous ne correspondez pas à cette enquête')).outcome,'screened_out'));test('ignores ordinary questions',()=>assert.equal(detectSurveyOutcome(root('Quel âge avez-vous ?')),null));
