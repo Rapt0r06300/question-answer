@@ -2,5 +2,4 @@ import test from'node:test';import assert from'node:assert/strict';import{rankGl
 test('unconfigured JustPlay never outranks a ZBD survey',()=>{const ranked=rankGlobalEarn({opportunities:[{id:'s',source:'zbd',satsPerMinute:10}],justPlay:{schemaVersion:1},now:1});assert.equal(ranked.some(x=>x.source==='justplay'),false)});
 test('orchestrator launches ZBD when JustPlay has no real cooldown',async()=>{let opened=null;const o=createEarnOrchestrator({openTarget:async x=>{opened=x}});const r=await o.tick({justPlay:{schemaVersion:1},opportunities:[{id:'s',launchTarget:'survey',source:'zbd'}]});assert.equal(r.kind,'ZBD_ACTIVITY');assert.equal(opened,'survey')});
 
-
 test('configured JustPlay uses canonical lastViewedAt field',()=>{const ranked=rankGlobalEarn({opportunities:[],justPlay:{lastViewedAt:0,cooldownMs:300000,launchTarget:'justplay://'},now:300000});assert.equal(ranked.some(x=>x.source==='justplay'),true)});
