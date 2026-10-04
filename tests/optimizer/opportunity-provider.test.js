@@ -6,7 +6,7 @@ test('reads persisted opportunityHistory schema without throwing',async()=>{
  const load=createOpportunityProvider({app:{opportunityHistory:{schemaVersion:1,items:[{id:'a',source:'survey'}]}},location:{href:'https://example.com'}});
  assert.deepEqual(await load(),[{id:'a',source:'survey'}]);
 });
-test('adds current PrimeEarn context without mutating history',async()=>{
- const load=createOpportunityProvider({app:{opportunityHistory:{schemaVersion:1,items:[]}},location:{href:'https://monetize.primeearn.com/x'}});
- const out=await load();assert.equal(out.length,1);assert.equal(out[0].id,'current-zbd-context');assert.equal(out[0].interruptibility,'non-interruptible');
+test('PrimeEarn with no visible cards does not invent a launch opportunity',async()=>{
+ const document={querySelectorAll:()=>[]};const load=createOpportunityProvider({app:{opportunityHistory:{schemaVersion:1,items:[]}},document,location:{href:'https://monetize.primeearn.com/x'}});
+ const out=await load();assert.deepEqual(out,[]);
 });
