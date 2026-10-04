@@ -1,0 +1,3 @@
+import test from'node:test';import assert from'node:assert/strict';import{analyzeQuestion,validateKnownAnswer}from'../../src/matcher/question-analyzer.js';
+test('classifies checkbox questions as multi-select',()=>{const a=analyzeQuestion({kind:'checkbox-group',questionText:'Quelles marques connaissez-vous ?',options:[{},{}]});assert.equal(a.interaction,'multi-select')});
+test('never auto-answers attention checks',()=>{const a=analyzeQuestion({kind:'radio-group',questionText:'Pour vérifier votre attention, veuillez choisir la deuxième réponse',options:[{},{}]});assert.equal(a.attentionCheck,true);assert.equal(validateKnownAnswer({analysis:a,value:'x'}).safe,false)});
