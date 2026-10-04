@@ -1,0 +1,3 @@
+import test from'node:test';import assert from'node:assert/strict';import{discoverQuestions}from'../../src/matcher/field-discovery.js';
+function el(label,value){const group={id:'g',getAttribute:k=>k==='data-question'?'Choisissez votre pays':null,querySelector:()=>null};return{tagName:'DIV',textContent:label,value:'',name:'',labels:[],parentElement:null,getAttribute:k=>k==='data-value'?value:null,closest:()=>group}}
+test('discovers data-value answer cards',()=>{const a=el('France','FR'),b=el('Belgique','BE');const root={querySelectorAll:()=>[a,b],getElementById:()=>null,querySelector:()=>null};const q=discoverQuestions(root);assert.equal(q.length,1);assert.equal(q[0].kind,'button-card');assert.equal(q[0].options[0].value,'FR')});
