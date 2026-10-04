@@ -1,0 +1,2 @@
+import test from'node:test';import assert from'node:assert/strict';import{detectComplexInteraction}from'../../src/matcher/complex-interaction.js';
+test('detects drag ranking widgets without attempting synthetic answers',()=>{const item={innerText:'Marque A'};const root={querySelectorAll:s=>s.includes('draggable')?[item]:[]};const x=detectComplexInteraction(root);assert.equal(x.kind,'drag-rank');assert.equal(x.count,1)});
