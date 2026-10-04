@@ -1,0 +1,3 @@
+import test from'node:test';import assert from'node:assert/strict';import{detectMatrixInteraction,detectImageChoice}from'../../src/matcher/special-interactions.js';
+test('detects matrix questions',()=>{const row=()=>({querySelectorAll:()=>[{},{}]});const table={innerText:'Satisfaction',querySelectorAll:()=>[row(),row()]};const root={querySelectorAll:s=>s==='table,[role="grid"]'?[table]:[]};assert.equal(detectMatrixInteraction(root).kind,'matrix')});
+test('detects image choices',()=>{const root={querySelectorAll:s=>s.includes('button img')?[{alt:'A'},{alt:'B'}]:[]};assert.equal(detectImageChoice(root).kind,'image-choice')});
